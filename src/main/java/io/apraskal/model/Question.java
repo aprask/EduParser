@@ -1,6 +1,6 @@
 package io.apraskal.model;
 
-import java.util.Hashmap;
+import java.util.*;
 
 public class Question {
     private HashMap<String, String[]> questionAndAnswers;
@@ -17,10 +17,10 @@ public class Question {
         this.questionAndAnswers = questionAndAnswers != null ? questionAndAnswers : new HashMap<>();
         this.questionAndWeights = questionAndWeights != null ? questionAndWeights : new HashMap<>();
     }
-    private HashMap<String, String[]> getQuestionAndAnswers() {
+    public HashMap<String, String[]> getQuestionAndAnswers() {
         return this.questionAndAnswers;
     }
-    private HashMap<String, Double> getQuestionAndWeights() {
+    public HashMap<String, Double> getQuestionAndWeights() {
         return this.questionAndWeights;
     }
 }
