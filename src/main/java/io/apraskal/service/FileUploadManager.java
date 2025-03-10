@@ -28,17 +28,7 @@ public class FileUploadManager {
             if (lock.tryLock(1, TimeUnit.SECONDS)) {
                 try {
                     instance = new FileUploadManager(path);
-                    String fileName = path.toString();
-                    String[] directories = fileName.split("/");
-                    fileName = directories[directories.length - 1];
-                    char[] fileCharArr = fileName.toCharArray();
-                    boolean parseFileExt = false;
-                    StringBuilder ext = new StringBuilder();
-                    for (int i = 0; i < fileCharArr.length; i++) {
-                        if (parseFileExt) ext.append(String.valueOf(fileCharArr[i]));
-                        if (String.valueOf(fileCharArr[i]).equals(".")) parseFileExt = true;
-                    }
-                    parseFile(ext.toString());
+                    parseFile(extractExt(path.toString()));
                 } finally {
                     lock.unlock();
                 }
@@ -51,6 +41,19 @@ public class FileUploadManager {
             throw new RuntimeException("Exeception occurred: " + e);
         }
         return instance;
+    }
+
+    private static String extractExt(String fileName) {
+        String[] directories = fileName.split("/");
+        fileName = directories[directories.length - 1];
+        char[] fileCharArr = fileName.toCharArray();
+        boolean parseFileExt = false;
+        StringBuilder ext = new StringBuilder();
+        for (int i = 0; i < fileCharArr.length; i++) {
+            if (parseFileExt) ext.append(String.valueOf(fileCharArr[i]));
+            if (String.valueOf(fileCharArr[i]).equals(".")) parseFileExt = true;
+        }
+        return ext.toString();
     }
 
     private static void parseFile(String fileExt) {
