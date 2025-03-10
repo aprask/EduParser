@@ -14,6 +14,7 @@ import java.lang.StringBuilder;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import io.apraskal.cache.*;
 
 public class FileUploadManager {
     // TODO add a queue instead of kicking user out (not rn, later)
@@ -85,6 +86,7 @@ public class FileUploadManager {
         try {
             List<String> fileDataList = Files.readAllLines(path);
             data = String.join(",", fileDataList);
+            MemoryStorage mem = MemoryStorage.getInstance(data);
         } catch (Exception e) {
             throw new RuntimeException("Exception: " + e);
         }
