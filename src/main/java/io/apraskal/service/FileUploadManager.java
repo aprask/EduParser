@@ -5,17 +5,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.lang.Exception;
 import java.lang.StringBuilder;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FileUploadManager {
     // TODO add a queue instead of kicking user out (not rn, later)
     private static FileUploadManager instance;
-    private Path path; // eventually make this a arr
-    private String data; // eventually make this a arr
+    private static Path path; // eventually make this a arr
+    private static String data; // eventually make this a arr
 
     private static Lock lock = new ReentrantLock();
 
@@ -77,7 +81,13 @@ public class FileUploadManager {
     }
 
     private static void parseCsv() {
-
+        String fileData = path.toString();
+        try {
+            List<String> fileDataList = Files.readAllLines(path);
+            data = String.join(",", fileDataList);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
     }
 
     private static void parseTsv() {
