@@ -1,13 +1,15 @@
 package io.apraskal;
 
-/**
- * Hello world!
- *
- */
+import io.apraskal.service.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class App
 {
-    public static void main( String[] args )
+    public static void main(String[] args )
     {
-        System.out.println( "Hello World!" );
+        Path path = Paths.get("/mnt/c/Users/andre/OneDrive/Desktop/OOP_PROJECT/grade_analyzer/gradeanalyzer/src/main/java/io/apraskal/test.txt");
+        // System.out.println("File name: " + path.getFileName());
+        FileUploadManager manager = FileUploadManager.getInstance(path);
     }
 }
