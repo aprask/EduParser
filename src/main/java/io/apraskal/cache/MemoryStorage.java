@@ -22,19 +22,23 @@ public class MemoryStorage {
     public static MemoryStorage getInstance(String data) {
         try {
             if (lock.tryLock(1, TimeUnit.SECONDS)) {
-                    try {
-                        instance = new MemoryStorage(data);
-                    } finally {
-                        lock.unlock();
-                    }
-                } else {
-                    Thread.sleep(2000);
-                    throw new RuntimeException("Could not acquire lock for file manager instance");
+                try {
+                    instance = new MemoryStorage(data);
+                } finally {
+                    lock.unlock();
                 }
-            } catch (Exception e) {
-                lock.unlock();
-                throw new RuntimeException("Exeception occurred: " + e);
+            } else {
+                Thread.sleep(2000);
+                throw new RuntimeException("Could not acquire lock for file manager instance");
             }
-            return instance;
+        } catch (Exception e) {
+            lock.unlock();
+            throw new RuntimeException("Exeception occurred: " + e);
         }
+        return instance;
+    }
+
+    public static List<Page> getPages() {
+        return pageTable;
+    }
 }
