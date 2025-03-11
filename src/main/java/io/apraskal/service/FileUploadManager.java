@@ -1,7 +1,7 @@
 package io.apraskal.service;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,9 +20,9 @@ public class FileUploadManager {
     // TODO add a queue instead of kicking user out (not rn, later)
     private static FileUploadManager instance;
     private static Path path; // eventually make this a arr
-    private static String data; // eventually make this a arr
 
-    private static Lock lock = new ReentrantLock();
+    private static Lock instanceCreationLock = new ReentrantLock();
+    private static Lock dataParsingLock = new ReentrantLock();
 
     private FileUploadManager(Path path) {
         this.path = path;
@@ -30,22 +30,39 @@ public class FileUploadManager {
 
     public static FileUploadManager getInstance(Path path) {
         try {
-            if (lock.tryLock(1, TimeUnit.SECONDS)) {
+            if (instanceCreationLock.tryLock(1, TimeUnit.SECONDS)) {
                 try {
                     instance = new FileUploadManager(path);
-                    parseFile(extractExt(path.toString()));
                 } finally {
-                    lock.unlock();
+                    instanceCreationLock.unlock();
                 }
             } else {
                 Thread.sleep(2000);
                 throw new RuntimeException("Could not acquire lock for file manager instance");
             }
         } catch (Exception e) {
-            lock.unlock();
+            instanceCreationLock.unlock();
             throw new RuntimeException("Exeception occurred: " + e);
         }
         return instance;
+    }
+
+    public static void parseInstance() {
+        try {
+            if (dataParsingLock.tryLock(1, TimeUnit.SECONDS)) {
+                try {
+                    parseFile(extractExt(path.toString()));
+                } finally {
+                    dataParsingLock.unlock();
+                }
+            } else {
+                Thread.sleep(2000);
+                throw new RuntimeException("Could not acquire lock for file manager instance");
+            }
+        } catch (Exception e) {
+            dataParsingLock.unlock();
+            throw new RuntimeException("Exeception occurred: " + e);
+        }
     }
 
     private static String extractExt(String fileName) {
@@ -78,22 +95,49 @@ public class FileUploadManager {
             case "xml":
                 parseXml();
                 break;
+            default:
+                break;
         }
     }
 
     private static void parseCsv() {
-        String fileData = path.toString();
+        String stringPath = path.toString();
+        List<List<String>> csv = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
+            String line;
+            while((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                csv.add(Arrays.asList(values));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
+
         try {
-            List<String> fileDataList = Files.readAllLines(path);
-            data = String.join(",", fileDataList);
-            MemoryStorage mem = MemoryStorage.getInstance(data);
+            MemoryStorage mem = MemoryStorage.getInstance(csv);
         } catch (Exception e) {
             throw new RuntimeException("Exception: " + e);
         }
     }
 
     private static void parseTsv() {
-        
+        String stringPath = path.toString();
+        List<List<String>> tsv = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
+            String line;
+            while((line = reader.readLine()) != null) {
+                String[] values = line.split("\t");
+                tsv.add(Arrays.asList(values));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
+
+        try {
+            MemoryStorage mem = MemoryStorage.getInstance(tsv);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
     }
 
     private static void parseXlsx() {

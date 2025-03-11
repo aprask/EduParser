@@ -13,13 +13,13 @@ public class MemoryStorage {
     private static List<Page> pageTable;
     private static long pages = 0;
 
-    private MemoryStorage(String data) {
+    private MemoryStorage(List<List<String>> data) {
         long cacheKey = pages++;
         Page page = new Page(cacheKey, data);
         System.out.println(page);
     }
 
-    public static MemoryStorage getInstance(String data) {
+    public static MemoryStorage getInstance(List<List<String>> data) {
         try {
             if (lock.tryLock(1, TimeUnit.SECONDS)) {
                 try {
