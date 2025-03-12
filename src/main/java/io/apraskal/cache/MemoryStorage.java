@@ -5,40 +5,46 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MemoryStorage {
 
-    private static MemoryStorage instance;
+    private volatile static MemoryStorage instance = null;
+    private volatile static AtomicLong pages = new AtomicLong();
+
     private static Lock lock = new ReentrantLock();
-    private static List<Page> pageTable;
-    private static long pages = 0;
+    private static List<Page> pageTable = new ArrayList<>();
 
-    private MemoryStorage(List<List<String>> data) {
-        long cacheKey = pages++;
-        Page page = new Page(cacheKey, data);
-        System.out.println(page);
-    }
+    private MemoryStorage() {}
 
-    public static MemoryStorage getInstance(List<List<String>> data) {
-        try {
-            if (lock.tryLock(1, TimeUnit.SECONDS)) {
-                try {
-                    instance = new MemoryStorage(data);
-                } finally {
-                    lock.unlock();
+    public static MemoryStorage getInstance() {
+        if (instance == null) {
+            try {
+                if (lock.tryLock(1, TimeUnit.SECONDS)) {
+                    try {
+                        instance = new MemoryStorage();
+                    } finally {
+                        lock.unlock();
+                    }
+                } else {
+                    Thread.sleep(2000);
+                    throw new RuntimeException("Could not acquire lock for file manager instance");
                 }
-            } else {
-                Thread.sleep(2000);
-                throw new RuntimeException("Could not acquire lock for file manager instance");
+            } catch (Exception e) {
+                throw new RuntimeException("Exeception occurred: " + e);
             }
-        } catch (Exception e) {
-            lock.unlock();
-            throw new RuntimeException("Exeception occurred: " + e);
         }
         return instance;
     }
 
     public static List<Page> getPages() {
         return pageTable;
+    }
+
+    public static void addPage(List<List<String>> data) {
+        long cacheKey = pages.getAndIncrement();
+        Page page = new Page(cacheKey, data);
+        pageTable.add(page);
     }
 }

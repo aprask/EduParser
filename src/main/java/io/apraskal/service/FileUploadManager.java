@@ -15,52 +15,52 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import io.apraskal.cache.*;
+import io.apraskal.model.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileUploadManager {
-    // TODO add a queue instead of kicking user out (not rn, later)
-    private static FileUploadManager instance;
-    private static Path path; // eventually make this a arr
+    private volatile static MemoryStorage mem;
+    private volatile static FileUploadManager instance;
+    private volatile static LinkedBlockingQueue<Path> queue = new LinkedBlockingQueue<>();
+    private volatile static ConcurrentHashMap<Integer, ConcurrentHashMap<String, List<Question>>> exam = new ConcurrentHashMap<>();
 
     private static Lock instanceCreationLock = new ReentrantLock();
-    private static Lock dataParsingLock = new ReentrantLock();
 
-    private FileUploadManager(Path path) {
-        this.path = path;
-    }
+    private FileUploadManager() {}
 
-    public static FileUploadManager getInstance(Path path) {
-        try {
-            if (instanceCreationLock.tryLock(1, TimeUnit.SECONDS)) {
-                try {
-                    instance = new FileUploadManager(path);
-                } finally {
-                    instanceCreationLock.unlock();
+    public static FileUploadManager getInstance() {
+        if (instance == null) {
+            try {
+                if (instanceCreationLock.tryLock(1, TimeUnit.SECONDS)) {
+                    try {
+                        instance = new FileUploadManager();
+                    } finally {
+                        instanceCreationLock.unlock();
+                    }
+                } else {
+                    Thread.sleep(2000);
+                    throw new RuntimeException("Could not acquire lock for file manager instance");
                 }
-            } else {
-                Thread.sleep(2000);
-                throw new RuntimeException("Could not acquire lock for file manager instance");
+            } catch (Exception e) {
+                throw new RuntimeException("Exeception occurred: " + e);
             }
-        } catch (Exception e) {
-            instanceCreationLock.unlock();
-            throw new RuntimeException("Exeception occurred: " + e);
         }
         return instance;
     }
 
+    public static void addPathToQueue(final Path path) {
+        if (!queue.contains(path)) queue.add(path);
+    }
+
     public static void parseInstance() {
         try {
-            if (dataParsingLock.tryLock(1, TimeUnit.SECONDS)) {
-                try {
-                    parseFile(extractExt(path.toString()));
-                } finally {
-                    dataParsingLock.unlock();
-                }
-            } else {
-                Thread.sleep(2000);
-                throw new RuntimeException("Could not acquire lock for file manager instance");
-            }
+            if (queue.peek() == null) return;
+            Path filePath = queue.poll();
+            String extension = extractExt(filePath.toString());
+            parseFile(extension, filePath);
+            // parseFile(extractExt(queue.poll().toString()));
         } catch (Exception e) {
-            dataParsingLock.unlock();
             throw new RuntimeException("Exeception occurred: " + e);
         }
     }
@@ -78,30 +78,28 @@ public class FileUploadManager {
         return ext.toString();
     }
 
-    private static void parseFile(String fileExt) {
+    private static void parseFile(String fileExt, Path fileName) {
         switch (fileExt) {
             case "csv":
-                parseCsv();
+                parseCsv(fileName);
                 break;
             case "tsv":
-                parseTsv();
                 break;
             case "xlsx":
-                parseXlsx();
                 break;
             case "json":
-                parseJson();
                 break;
             case "xml":
-                parseXml();
+                break;
+            case "pdf":
                 break;
             default:
                 break;
         }
     }
 
-    private static void parseCsv() {
-        String stringPath = path.toString();
+    private static void parseCsv(Path fileName) {
+        String stringPath = fileName.toString();
         List<List<String>> csv = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
             String line;
@@ -114,41 +112,11 @@ public class FileUploadManager {
         }
 
         try {
-            MemoryStorage mem = MemoryStorage.getInstance(csv);
+            mem = MemoryStorage.getInstance();
+            mem.addPage(csv);
         } catch (Exception e) {
             throw new RuntimeException("Exception: " + e);
         }
     }
 
-    private static void parseTsv() {
-        String stringPath = path.toString();
-        List<List<String>> tsv = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
-            String line;
-            while((line = reader.readLine()) != null) {
-                String[] values = line.split("\t");
-                tsv.add(Arrays.asList(values));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-
-        try {
-            MemoryStorage mem = MemoryStorage.getInstance(tsv);
-        } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-    }
-
-    private static void parseXlsx() {
-        
-    }
-
-    private static void parseJson() {
-        
-    }
-
-    private static void parseXml() {
-        
-    }
 }
