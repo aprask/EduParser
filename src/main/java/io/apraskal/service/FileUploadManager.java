@@ -59,7 +59,6 @@ public class FileUploadManager {
             Path filePath = queue.poll();
             String extension = extractExt(filePath.toString());
             parseFile(extension, filePath);
-            // parseFile(extractExt(queue.poll().toString()));
         } catch (Exception e) {
             throw new RuntimeException("Exeception occurred: " + e);
         }

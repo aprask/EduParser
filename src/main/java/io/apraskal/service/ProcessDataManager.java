@@ -28,24 +28,22 @@ public class ProcessDataManager {
     private static Lock pageReplacementLock = new ReentrantLock();
     private static Lock transformDataLock = new ReentrantLock();
 
-    private ProcessDataManager(List<Page> pages) {
-        this.pages = pages;
+    private ProcessDataManager() {
+        
     }
 
-    public static ProcessDataManager getInstance(List<Page> pages) {
-        if (pages != null) {
-            if (instance == null) {
-                try {
-                    if (processDataLock.tryLock(1, TimeUnit.SECONDS)) {
-                        try {
-                            instance = new ProcessDataManager(pages);
-                        } finally {
-                            processDataLock.unlock();
-                        }
+    public static ProcessDataManager getInstance() {
+        if (instance == null) {
+            try {
+                if (processDataLock.tryLock(1, TimeUnit.SECONDS)) {
+                    try {
+                        instance = new ProcessDataManager();
+                    } finally {
+                        processDataLock.unlock();
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException("Exeception occurred: " + e);
                 }
+            } catch (Exception e) {
+                throw new RuntimeException("Exeception occurred: " + e);
             }
         }
         return instance;
@@ -75,7 +73,7 @@ public class ProcessDataManager {
                         Page currentPage = pages.get(i);
                         List<List<String>> allRows = currentPage.getData();
                         for (int j = 0; j < allRows.size(); j++) {
-                            
+                            System.out.println(allRows.get(j));
                         }
                     }
                 } finally {

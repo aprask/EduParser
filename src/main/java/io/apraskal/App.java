@@ -8,16 +8,17 @@ import java.nio.file.Paths;
 
 public class App
 {
-    public static void main(String[] args )
+    public static void main(String[] args)
     {
         Path path = Paths.get("/mnt/c/Users/andre/OneDrive/Desktop/OOP_PROJECT/grade_analyzer/gradeanalyzer/src/main/java/io/apraskal/test.csv");
-        // // System.out.println("File name: " + path.getFileName());
-        // FileUploadManager manager = FileUploadManager.getInstance(path);
-        // manager.parseInstance();
-        // MemoryStorage mem = MemoryStorage.getInstance();
-        // // System.out.println(mem.getPages());
-        // ProcessDataManager proc = ProcessDataManager.getInstance(mem.getPages());
-        // proc.transformData();
+        FileUploadManager manager = FileUploadManager.getInstance();
+        manager.addPathToQueue(path);
+        manager.parseInstance();
+        MemoryStorage mem = MemoryStorage.getInstance();
+        System.out.println(mem.getPages());
+        ProcessDataManager proc = ProcessDataManager.getInstance();
+        proc.pageReplace(mem.getPages());
+        proc.transformData();
 
         // StudentInfo student = new StudentInfo(1,2,3,5.5,6);
         // StudentInfo[] students = new StudentInfo[1];
