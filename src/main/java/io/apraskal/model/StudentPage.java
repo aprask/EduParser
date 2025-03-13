@@ -2,15 +2,15 @@ package io.apraskal.model;
 
 import java.util.List;
 
-public class Page {
+public class StudentPage {
     private long cacheKey;
     private List<List<String>> data;
 
-    public Page() {
+    public StudentPage() {
 
     }
     
-    public Page(long cacheKey, List<List<String>> data) {
+    public StudentPage(long cacheKey, List<List<String>> data) {
         this.cacheKey = cacheKey;
         this.data = data;
     }

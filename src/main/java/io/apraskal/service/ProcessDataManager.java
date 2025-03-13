@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-import io.apraskal.model.Page;
+import io.apraskal.model.StudentPage;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,7 @@ import io.apraskal.service.*;
 
 public class ProcessDataManager {
     private volatile static ProcessDataManager instance;
-    private volatile static List<Page> pages = new ArrayList<>();
+    private volatile static List<StudentPage> studentPages = new ArrayList<>();
 
     private static Lock processDataLock = new ReentrantLock();
     private static Lock pageReplacementLock = new ReentrantLock();
@@ -49,28 +49,26 @@ public class ProcessDataManager {
         return instance;
     }
 
-    public static void pageReplace(List<Page> newPages) {
-        if (pages != null) {
-            try {
-                if (processDataLock.tryLock(1, TimeUnit.SECONDS)) {
-                    try {
-                        pages = newPages;
-                    } finally {
-                        processDataLock.unlock();
-                    }
+    public static void studentPageReplace(List<StudentPage> newPages) {
+        try {
+            if (processDataLock.tryLock(1, TimeUnit.SECONDS)) {
+                try {
+                    studentPages = newPages;
+                } finally {
+                    processDataLock.unlock();
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Exeception occurred: " + e);
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Exeception occurred: " + e);
         }
     }
 
-    public static void transformData() {
+    public static void transformStudentData() {
         try {
             if (transformDataLock.tryLock(1, TimeUnit.SECONDS)) {
                 try {
-                    for (int i = 0; i < pages.size(); i++) {
-                        Page currentPage = pages.get(i);
+                    for (int i = 0; i < studentPages.size(); i++) {
+                        StudentPage currentPage = studentPages.get(i);
                         List<List<String>> allRows = currentPage.getData();
                         for (int j = 0; j < allRows.size(); j++) {
                             System.out.println(allRows.get(j));

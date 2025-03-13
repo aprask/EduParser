@@ -18,6 +18,12 @@ import io.apraskal.cache.*;
 import io.apraskal.model.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument; 
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import org.apache.pdfbox.pdmodel.PDPage;
 
 public class FileUploadManager {
     private volatile static MemoryStorage mem;
@@ -54,10 +60,12 @@ public class FileUploadManager {
     }
 
     public static void parseInstance() {
+        System.out.println("Inside of parse instance with queue value: " + queue.peek());
         try {
             if (queue.peek() == null) return;
             Path filePath = queue.poll();
             String extension = extractExt(filePath.toString());
+            System.out.println("Extension: " + extension);
             parseFile(extension, filePath);
         } catch (Exception e) {
             throw new RuntimeException("Exeception occurred: " + e);
@@ -91,6 +99,7 @@ public class FileUploadManager {
             case "xml":
                 break;
             case "pdf":
+                parsePdf(fileName);
                 break;
             default:
                 break;
@@ -112,9 +121,47 @@ public class FileUploadManager {
 
         try {
             mem = MemoryStorage.getInstance();
-            mem.addPage(csv);
+            mem.addStudentPage(csv);
         } catch (Exception e) {
             throw new RuntimeException("Exception: " + e);
+        }
+    }
+
+    private static void parsePdf(Path fileName) {
+        try {
+            File pdfFile = fileName.toFile();
+            PDDocument pdf = Loader.loadPDF(pdfFile);
+            System.out.println(pdf.getDocument());
+            List<PDPage> pdfPages = new ArrayList<>();
+            List<InputStream> pdfData = new ArrayList<>();
+            for (int i = 0; i < pdf.getNumberOfPages(); i++) {
+                pdfPages.add(pdf.getPage(i));
+                pdfData.add(pdf.getPage(i).getContents());
+                getRawPdfData(pdfData.get(i));
+            }
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
+    }
+
+    private static void getRawPdfData(InputStream data) {
+        try {
+            int byteData = data.read();
+            List<Character> collectedData = new ArrayList<>();
+            while (byteData != -1) {
+                collectedData.add((char) byteData);
+                byteData = data.read();
+            }
+            cleanPdfData(collectedData);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception: " + e);
+        }
+    }
+
+    private static void cleanPdfData(List<Character> rawData) {
+        for (int i = 0; i < rawData.size(); i++) {
+            System.out.println(rawData.get(i));
         }
     }
 

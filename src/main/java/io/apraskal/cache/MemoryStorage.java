@@ -1,6 +1,6 @@
 package io.apraskal.cache;
 
-import io.apraskal.model.Page;
+import io.apraskal.model.StudentPage;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
@@ -10,11 +10,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MemoryStorage {
 
-    private volatile static MemoryStorage instance = null;
-    private volatile static AtomicLong pages = new AtomicLong();
+    private volatile static MemoryStorage instance;
+    private volatile static AtomicLong studentPages = new AtomicLong();
+    private volatile static AtomicLong examPages = new AtomicLong();
 
     private static Lock lock = new ReentrantLock();
-    private static List<Page> pageTable = new ArrayList<>();
+    private static List<StudentPage> studentPageTable = new ArrayList<>();
 
     private MemoryStorage() {}
 
@@ -38,13 +39,13 @@ public class MemoryStorage {
         return instance;
     }
 
-    public static List<Page> getPages() {
-        return pageTable;
+    public static List<StudentPage> getStudentPages() {
+        return studentPageTable;
     }
 
-    public static void addPage(List<List<String>> data) {
-        long cacheKey = pages.getAndIncrement();
-        Page page = new Page(cacheKey, data);
-        pageTable.add(page);
+    public static void addStudentPage(List<List<String>> data) {
+        long cacheKey = studentPages.getAndIncrement();
+        StudentPage page = new StudentPage(cacheKey, data);
+        studentPageTable.add(page);
     }
 }

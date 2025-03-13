@@ -8,7 +8,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ClassroomManager {
-    // batch id:class
     private static ConcurrentHashMap<Integer, Classroom> classes = new ConcurrentHashMap<>();
     private static ConcurrentLinkedQueue<Classroom> classRoomQueue = new ConcurrentLinkedQueue<>();
 
@@ -18,7 +17,7 @@ public class ClassroomManager {
 
     }
 
-    // public static ClassroomManager getInstance() {
+    // public static ClassroomManager getInstance() {+9
     // }
     
 }
