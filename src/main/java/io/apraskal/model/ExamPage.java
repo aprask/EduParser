@@ -3,15 +3,15 @@ package io.apraskal.model;
 import java.util.List;
 import io.apraskal.model.*;
 
-public class StudentPage extends DBEntry {
-    private List<List<String>> data;
+public class ExamPage extends DBEntry {
+    private List<Question> data;
 
-    public StudentPage() {
+    public ExamPage() {
+
     }
     
-    public StudentPage(long cacheKey, List<List<String>> data) {
+    public ExamPage(long cacheKey, List<Question> data) {
         super(cacheKey);
-        System.out.println("This objects key: " + cacheKey);
         this.data = data;
     }
 
@@ -25,11 +25,11 @@ public class StudentPage extends DBEntry {
         super.cacheKey = cacheKey;
     }
 
-    public List<List<String>> getData() {
+    public List<Question> getData() {
         return this.data;
     }
 
-    public void setData(List<List<String>> data) {
+    public void setData(List<Question> data) {
         this.data = data;
     }
 

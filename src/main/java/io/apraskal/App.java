@@ -3,6 +3,7 @@ package io.apraskal;
 import io.apraskal.service.*;
 import io.apraskal.model.*;
 import io.apraskal.cache.*;
+import java.util.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -12,33 +13,22 @@ public class App
     {
         Path path1 = Paths.get("/mnt/c/Users/andre/OneDrive/Desktop/OOP_PROJECT/grade_analyzer/gradeanalyzer/src/main/java/io/apraskal/test.csv");
         Path path2 = Paths.get("/mnt/c/Users/andre/OneDrive/Desktop/OOP_PROJECT/grade_analyzer/gradeanalyzer/src/main/java/io/apraskal/test2.csv");
-        Path pdfPath = Paths.get("/mnt/c/Users/andre/OneDrive/Desktop/OOP_PROJECT/grade_analyzer/gradeanalyzer/src/main/java/io/apraskal/generic_exam.pdf");
         FileUploadManager manager = FileUploadManager.getInstance();
-        manager.addPathToQueue(pdfPath);
-        // manager.addPathToQueue(path2);
+        manager.addPathToQueue(path1);
+        manager.addPathToQueue(path2);
         manager.parseInstance();
-        // manager.parseInstance();
-        // MemoryStorage mem = MemoryStorage.getInstance();
-        // System.out.println(mem.getStudentPages());
-        // ProcessDataManager proc = ProcessDataManager.getInstance();
-        // proc.pageReplace(mem.getPages());
-        // proc.transformData();
-
-        // StudentInfo student = new StudentInfo(1,2,3,5.5,6);
-        // StudentInfo[] students = new StudentInfo[1];
-        // students[0] = student;
-
-        // ExamInfo examInfo = new ExamInfo();
-        // ExamInfo[] exams = new ExamInfo[1];
-        // exams[0] = examInfo;
-
-        // GradeScale gradeScale = new GradeScale();
-        // GradeScale[] grades = new GradeScale[1];
-        // grades[0] = gradeScale;
-
-        // Classroom classRoom = new Classroom.ClassroomBuilder(1, students, exams, gradeScale).buildClassroom();
-        // System.out.println(classRoom);
-
-        
+        manager.parseInstance();
+        Question question1 = new FITB("SomethingCorrect", "Put something correct", 5);
+        Question question2 = new FITB("SomethingAlsoCorrect", "Put something else correct", 15);
+        List<Question> questions = new ArrayList<>();
+        questions.add(question1);
+        questions.add(question2);
+        for (int i = 0; i < questions.size(); i++) questions.get(i).displayQuestion();
+        MemoryStorage mem = MemoryStorage.getInstance();
+        mem.addExamPage(questions);
+        // System.out.println(mem.getAllStudentPages());
+        ProcessDataManager procMan = ProcessDataManager.getInstance();
+        procMan.processStudentData(mem.getStudentPage(0));
+        procMan.processExamData(mem.getExamPage(0));
     }
 }

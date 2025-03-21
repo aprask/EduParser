@@ -1,12 +1,12 @@
 package io.apraskal.cache;
 
-import io.apraskal.model.StudentPage;
+import io.apraskal.model.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import io.apraskal.model.Exam;
 
 public class MemoryStorage {
 
@@ -15,7 +15,8 @@ public class MemoryStorage {
     private volatile static AtomicLong examPages = new AtomicLong();
 
     private static Lock lock = new ReentrantLock();
-    private static List<StudentPage> studentPageTable = new ArrayList<>();
+    private static Vector<StudentPage> studentPageTable = new Vector<>();
+    private static Vector<ExamPage> examPageTable = new Vector<>();
 
     private MemoryStorage() {}
 
@@ -39,13 +40,35 @@ public class MemoryStorage {
         return instance;
     }
 
-    public static List<StudentPage> getStudentPages() {
-        return studentPageTable;
+    public static StudentPage getStudentPage(long cacheKey) {
+        for (int i = 0; i < studentPageTable.size(); i++) if (studentPageTable.get(i).getCacheKey() == cacheKey) return studentPageTable.get(i);
+        throw new RuntimeException("Cannot find page from specified cache key: " + cacheKey);
+    }
+
+    public static ExamPage getExamPage(long cacheKey) {
+        for (int i = 0; i < examPageTable.size(); i++) if (examPageTable.get(i).getCacheKey() == cacheKey) return examPageTable.get(i);
+        throw new RuntimeException("Cannot find page from specified cache key: " + cacheKey);
     }
 
     public static void addStudentPage(List<List<String>> data) {
         long cacheKey = studentPages.getAndIncrement();
+        System.out.println("NEW CACHE KEY: " + cacheKey);
         StudentPage page = new StudentPage(cacheKey, data);
+        System.out.println(page);
         studentPageTable.add(page);
+    }
+
+    public static void addExamPage(List<Question> data) {
+        long cacheKey = examPages.getAndIncrement();
+        ExamPage page = new ExamPage(cacheKey, data);
+        examPageTable.add(page);
+    }
+
+    public static Vector<StudentPage> getAllStudentPages() {
+        return studentPageTable;
+    }
+
+    public static Vector<ExamPage> getAllExamPages() {
+        return examPageTable;
     }
 }

@@ -19,19 +19,17 @@ import io.apraskal.model.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.File;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument; 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import org.apache.pdfbox.pdmodel.PDPage;
+import io.apraskal.service.*;
 
 public class FileUploadManager {
-    private volatile static MemoryStorage mem;
+    private volatile static MemoryStorage mem = MemoryStorage.getInstance();
     private volatile static FileUploadManager instance;
     private volatile static LinkedBlockingQueue<Path> queue = new LinkedBlockingQueue<>();
-    private volatile static ConcurrentHashMap<Integer, ConcurrentHashMap<String, List<Question>>> exam = new ConcurrentHashMap<>();
 
     private static Lock instanceCreationLock = new ReentrantLock();
+    private static Lock parsingCsvLock = new ReentrantLock();
 
     private FileUploadManager() {}
 
@@ -64,6 +62,7 @@ public class FileUploadManager {
         try {
             if (queue.peek() == null) return;
             Path filePath = queue.poll();
+            System.out.println("Observing this path: " + filePath);
             String extension = extractExt(filePath.toString());
             System.out.println("Extension: " + extension);
             parseFile(extension, filePath);
@@ -98,70 +97,37 @@ public class FileUploadManager {
                 break;
             case "xml":
                 break;
-            case "pdf":
-                parsePdf(fileName);
-                break;
             default:
                 break;
         }
     }
 
     private static void parseCsv(Path fileName) {
-        String stringPath = fileName.toString();
-        List<List<String>> csv = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
-            String line;
-            while((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
-                csv.add(Arrays.asList(values));
+        try {
+            if (instanceCreationLock.tryLock(1, TimeUnit.SECONDS)) {
+                String stringPath = fileName.toString();
+                List<List<String>> csv = new ArrayList<>();
+                try (BufferedReader reader = new BufferedReader(new FileReader(stringPath))) {
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        String[] values = line.split(",");
+                        csv.add(Arrays.asList(values));
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("Exception: " + e);
+                }
+                try {
+                    System.out.println("Adding to page table");
+                    mem.addStudentPage(csv);
+                } catch (Exception e) {
+                    throw new RuntimeException("Exception: " + e);
+                }
+            } else {
+                Thread.sleep(2000);
+                throw new RuntimeException("Could not acquire lock for file manager instance");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-
-        try {
-            mem = MemoryStorage.getInstance();
-            mem.addStudentPage(csv);
-        } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-    }
-
-    private static void parsePdf(Path fileName) {
-        try {
-            File pdfFile = fileName.toFile();
-            PDDocument pdf = Loader.loadPDF(pdfFile);
-            System.out.println(pdf.getDocument());
-            List<PDPage> pdfPages = new ArrayList<>();
-            List<InputStream> pdfData = new ArrayList<>();
-            for (int i = 0; i < pdf.getNumberOfPages(); i++) {
-                pdfPages.add(pdf.getPage(i));
-                pdfData.add(pdf.getPage(i).getContents());
-                getRawPdfData(pdfData.get(i));
-            }
-            
-        } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-    }
-
-    private static void getRawPdfData(InputStream data) {
-        try {
-            int byteData = data.read();
-            List<Character> collectedData = new ArrayList<>();
-            while (byteData != -1) {
-                collectedData.add((char) byteData);
-                byteData = data.read();
-            }
-            cleanPdfData(collectedData);
-        } catch (Exception e) {
-            throw new RuntimeException("Exception: " + e);
-        }
-    }
-
-    private static void cleanPdfData(List<Character> rawData) {
-        for (int i = 0; i < rawData.size(); i++) {
-            System.out.println(rawData.get(i));
+                throw new RuntimeException("Exeception occurred: " + e);
         }
     }
 
