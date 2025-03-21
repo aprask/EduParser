@@ -1,6 +1,7 @@
 package io.apraskal;
 
 import io.apraskal.service.*;
+import io.apraskal.service.data.*;
 import io.apraskal.model.*;
 import io.apraskal.cache.*;
 import java.util.*;
@@ -26,7 +27,6 @@ public class App
         for (int i = 0; i < questions.size(); i++) questions.get(i).displayQuestion();
         MemoryStorage mem = MemoryStorage.getInstance();
         mem.addExamPage(questions);
-        // System.out.println(mem.getAllStudentPages());
         ProcessDataManager procMan = ProcessDataManager.getInstance();
         procMan.processStudentData(mem.getStudentPage(0));
         procMan.processExamData(mem.getExamPage(0));
