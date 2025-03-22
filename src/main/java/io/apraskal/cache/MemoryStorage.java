@@ -15,6 +15,9 @@ public class MemoryStorage {
     private volatile static AtomicLong examPages = new AtomicLong();
 
     private static Lock lock = new ReentrantLock();
+    private static Lock studentInsertLock = new ReentrantLock();
+    private static Lock examInsertLock = new ReentrantLock();
+
     private static Vector<StudentPage> studentPageTable = new Vector<>();
     private static Vector<ExamPage> examPageTable = new Vector<>();
 
@@ -51,17 +54,35 @@ public class MemoryStorage {
     }
 
     public static void addStudentPage(List<List<String>> data) {
-        long cacheKey = studentPages.getAndIncrement();
-        System.out.println("NEW CACHE KEY: " + cacheKey);
-        StudentPage page = new StudentPage(cacheKey, data);
-        System.out.println(page);
-        studentPageTable.add(page);
+        try {
+            if (studentInsertLock.tryLock(1, TimeUnit.SECONDS)) {
+                try {
+                    long cacheKey = studentPages.getAndIncrement();
+                    StudentPage page = new StudentPage(cacheKey, data);
+                    studentPageTable.add(page);
+                } finally {
+                    studentInsertLock.unlock();
+                }
+            }
+        } catch (Exception e) {
+             throw new RuntimeException("Exeception occurred: " + e);
+        }
     }
 
     public static void addExamPage(List<Question> data) {
-        long cacheKey = examPages.getAndIncrement();
-        ExamPage page = new ExamPage(cacheKey, data);
-        examPageTable.add(page);
+        try {
+            if (examInsertLock.tryLock(1, TimeUnit.SECONDS)) {
+                try {
+                    long cacheKey = examPages.getAndIncrement();
+                    ExamPage page = new ExamPage(cacheKey, data);
+                    examPageTable.add(page);
+                } finally {
+                    examInsertLock.unlock();
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     public static Vector<StudentPage> getAllStudentPages() {

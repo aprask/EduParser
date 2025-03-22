@@ -5,6 +5,7 @@ import java.util.concurrent.locks.*;
 import java.util.concurrent.TimeUnit;
 import java.math.*;
 import io.apraskal.service.data.ProcessDataManager;
+import io.apraskal.model.*;
 
 public class StatsCalc {
     private volatile static StatsCalc instance;
@@ -33,8 +34,10 @@ public class StatsCalc {
         return instance;
     }
 
-    // public static BigDecimal calculateMean() {
-
-    // }
+    public static double calculateMean(Student[] students) {
+        int sum = 0;
+        for (int i = 0; i < students.length; i++) sum += students[i].getGrade();
+        return sum/students.length;
+    }
 
 }

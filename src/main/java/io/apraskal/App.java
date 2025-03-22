@@ -28,7 +28,10 @@ public class App
         MemoryStorage mem = MemoryStorage.getInstance();
         mem.addExamPage(questions);
         ProcessDataManager procMan = ProcessDataManager.getInstance();
-        procMan.processStudentData(mem.getStudentPage(0));
-        procMan.processExamData(mem.getExamPage(0));
+        Student[] studentArr1 = procMan.processStudentData(mem.getStudentPage(0));
+        System.out.println(studentArr1[0]);
+        // procMan.processExamData(mem.getExamPage(0));
+        StatsCalc calc = StatsCalc.getInstance();
+        System.out.println("MEAN: " + calc.calculateMean(studentArr1));
     }
 }

@@ -49,17 +49,6 @@ public class ProcessDataManager {
         return instance;
     }
 
-    public static void processStudentData(StudentPage studentPage) {
-        int studentCap = studentPage.getData().size();
-        String[][] fileArr = new String[studentCap][COL_CAP];
-        Student[] students = new Student[studentCap];
-        for (int i = 1; i < studentPage.getData().size(); i++) {
-            String[] dataArr = studentPage.getData().get(i).toArray(new String[studentPage.getData().get(i).size()]);
-            for (int j = 0; j < COL_CAP; j++) fileArr[i][j] = dataArr[j];
-            students[i] = transformStudent(fileArr[i]);
-        }
-    }
-
     private static Student transformStudent(String[] student) {
         if (student.length != 9) throw new RuntimeException("Incorrect array length");
         try {
@@ -79,6 +68,19 @@ public class ProcessDataManager {
         } catch (Exception e) {
             throw new RuntimeException("Exeception occurred: " + e);
         }
+    }
+
+    public static Student[] processStudentData(StudentPage studentPage) {
+        int studentCap = studentPage.getData().size();
+        String[][] fileArr = new String[studentCap][COL_CAP];
+        Student[] students = new Student[studentCap-1];
+        for (int i = 1; i < studentPage.getData().size(); i++) {
+            String[] dataArr = studentPage.getData().get(i).toArray(new String[studentPage.getData().get(i).size()]);
+            for (int j = 0; j < COL_CAP; j++) fileArr[i][j] = dataArr[j];
+            Student transformedStudent = transformStudent(fileArr[i]);
+            students[i-1] = transformedStudent;
+        }
+        return students;
     }
 
     public static void processExamData(ExamPage examPage) {
