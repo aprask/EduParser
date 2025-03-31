@@ -7,13 +7,13 @@ student_id,first_name,last_name,grade,exam_date,study_hours,attendance_percentag
 1007,Linda,Lee,57,2025-03-15,12,78,54,Math
 1009,David,Wilson,68,2025-03-15,22,92,65,Math
 1010,Susan,Moore,61,2025-03-15,17,89,59,Math
-1011,Robert,Taylor,59,2025-03-15,14,82,58,Math
+1011,Robert,Taylor,66,2025-03-15,14,82,58,Math
 1012,Jessica,Anderson,54,2025-03-15,10,75,52,Math
 1013,William,Thomas,63,2025-03-15,19,93,61,Math
 1014,Mary,Jackson,56,2025-03-15,11,76,53,Math
 1015,Richard,White,67,2025-03-15,21,94,64,Math
 1016,Patricia,Harris,53,2025-03-15,9,74,50,Math
-1017,Joseph,Martin,70,2025-03-15,23,97,68,Math
-1018,Karen,Clark,66,2025-03-15,18,91,63,Math
+1017,Joseph,Martin,70,2025-03-15,23,89,68,Math
+1018,Karen,Clark,66,2025-03-15,18,89,63,Math
 1019,Christopher,Lewis,92,2025-03-15,25,99,85,Math
-1020,Barbara,Walker,97,2025-03-15,30,100,90,Math
+1020,Barbara,Walker,66,2025-03-15,30,100,90,Math

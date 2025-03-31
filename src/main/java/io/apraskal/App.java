@@ -31,7 +31,8 @@ public class App
         Student[] studentArr1 = procMan.processStudentData(mem.getStudentPage(0));
         System.out.println(studentArr1[0]);
         // procMan.processExamData(mem.getExamPage(0));
+        // for (int i = 0; i < studentArr1.length; i++) System.out.println(studentArr1[i]);
         StatsCalc calc = StatsCalc.getInstance();
-        System.out.println("MEAN: " + calc.calculateMean(studentArr1));
+        System.out.println(calc.calculateStatistics(studentArr1));
     }
 }
