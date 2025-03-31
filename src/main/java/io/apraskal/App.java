@@ -29,10 +29,12 @@ public class App
         mem.addExamPage(questions);
         ProcessDataManager procMan = ProcessDataManager.getInstance();
         Student[] studentArr1 = procMan.processStudentData(mem.getStudentPage(0));
-        System.out.println(studentArr1[0]);
+        // System.out.println(studentArr1[0]);
         // procMan.processExamData(mem.getExamPage(0));
         // for (int i = 0; i < studentArr1.length; i++) System.out.println(studentArr1[i]);
         StatsCalc calc = StatsCalc.getInstance();
-        System.out.println(calc.calculateStatistics(studentArr1));
+        ReportGenerator rep = ReportGenerator.getInstance();
+        rep.createPDFReport(calc.calculateStatistics(studentArr1));
+        
     }
 }
