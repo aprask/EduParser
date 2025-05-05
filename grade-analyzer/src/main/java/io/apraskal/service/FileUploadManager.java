@@ -2,30 +2,24 @@ package io.apraskal.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.TimeUnit;
-import java.lang.Exception;
-import java.lang.StringBuilder;
-import java.util.*;
-import io.apraskal.cache.*;
-import io.apraskal.model.*;
-import java.io.File;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import io.apraskal.service.*;
 
+import io.apraskal.cache.MemoryStorage;
+@SuppressWarnings("static-access")
 public class FileUploadManager {
     private volatile static MemoryStorage mem = MemoryStorage.getInstance();
     private volatile static FileUploadManager instance;
     protected static Queue<Path> queue = new LinkedList<>();
 
-    private static Lock instanceCreationLock = new ReentrantLock();
-    private static Lock parsingCsvLock = new ReentrantLock();
+    private static final Lock instanceCreationLock = new ReentrantLock();
 
     private FileUploadManager() {}
 
@@ -42,7 +36,7 @@ public class FileUploadManager {
                     Thread.sleep(2000);
                     throw new RuntimeException("Could not acquire lock for file manager instance");
                 }
-            } catch (Exception e) {
+            } catch (InterruptedException | RuntimeException e) {
                 throw new RuntimeException("Exeception occurred: " + e);
             }
         }
@@ -82,11 +76,11 @@ public class FileUploadManager {
 
     private static void parseFile(String fileExt, Path fileName) {
         switch (fileExt) {
-            case "csv":
-                parseCsv(fileName);
-                break;
-            default:
-                break;
+            case "csv" -> parseCsv(fileName);
+            default -> {
+                System.out.println("Invalid File Type");
+                System.exit(1);
+            }
         }
     }
 

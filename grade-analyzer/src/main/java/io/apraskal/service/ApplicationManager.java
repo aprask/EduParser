@@ -1,16 +1,14 @@
 package io.apraskal.service;
 
-import java.lang.Exception;
-import java.util.concurrent.locks.*;
-import java.util.concurrent.TimeUnit;
-import io.apraskal.service.data.*;
-import io.apraskal.service.*;
-import io.apraskal.model.*;
-import io.apraskal.cache.*;
-import java.util.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import io.apraskal.cache.MemoryStorage;
+import io.apraskal.service.data.ProcessDataManager;
+
+@SuppressWarnings("static-access")
 public class ApplicationManager {
     private volatile static ApplicationManager instance;
     private volatile static FileUploadManager fileUploadManager = FileUploadManager.getInstance();
@@ -19,7 +17,7 @@ public class ApplicationManager {
     private volatile static ReportGenerator rep = ReportGenerator.getInstance();
     private volatile static StatsCalc calc = StatsCalc.getInstance();
 
-    private static Lock instanceCreationLock = new ReentrantLock();
+    private static final Lock instanceCreationLock = new ReentrantLock();
 
     public ApplicationManager() {}
 

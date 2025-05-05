@@ -1,26 +1,27 @@
 package io.apraskal.service;
 
-import java.lang.Exception;
 import java.util.concurrent.locks.*;
 import java.util.concurrent.TimeUnit;
-import io.apraskal.service.data.ProcessDataManager;
+
 import io.apraskal.model.*;
+
 import java.util.*;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+
 import java.nio.file.Path;
 import java.io.File;
 
 public class ReportGenerator {
     private volatile static ReportGenerator instance;
 
-    private static Lock instanceCreationLock = new ReentrantLock();
+    private static final Lock instanceCreationLock = new ReentrantLock();
 
-    private File regularText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationSans-Regular.ttf");
-    private File boldedText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationMono-Bold.ttf");
+    private final File regularText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationSans-Regular.ttf");
+    private final File boldedText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationMono-Bold.ttf");
 
     private ReportGenerator() {}
 

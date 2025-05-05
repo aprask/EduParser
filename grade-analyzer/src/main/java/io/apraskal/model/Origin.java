@@ -1,52 +1,46 @@
 package io.apraskal.model;
 
-import java.nio.file.Paths;
 import java.nio.file.Path;
 
 public class Origin {
-    private String os;
-    private String initArg;
-    private String[] kArgs;
+    private final String os;
+    private final Path fullPath;
 
     private Origin(OriginBuilder builder) {
         this.os = builder.os;
-        this.initArg = builder.initArg;
-        this.kArgs = builder.kArgs;
+        this.fullPath = builder.fullPath.toAbsolutePath().normalize();
     }
 
     public String getOs() {
         return os;
     }
 
+    public Path getFullPath() {
+        return fullPath;
+    }
+
     public String getInitArg() {
-        return initArg;
+        return fullPath.getFileName().toString();
     }
 
     public String[] getKArgs() {
-        return kArgs;
-    }
-
-    public Path getFullPath() {
-        return Paths.get("", kArgs).resolve(initArg);
+        int nameCount = fullPath.getNameCount();
+        String[] parts = new String[Math.max(0, nameCount - 1)];
+        for (int i = 0; i < parts.length; i++) parts[i] = fullPath.getName(i).toString();
+        return parts;
     }
 
     public static class OriginBuilder {
         private String os;
-        private String initArg;
-        private String[] kArgs;
+        private Path fullPath;
 
         public OriginBuilder setOs(String os) {
             this.os = os;
             return this;
         }
 
-        public OriginBuilder setInitArg(String initArg) {
-            this.initArg = initArg;
-            return this;
-        }
-
-        public OriginBuilder setKArgs(String[] kArgs) {
-            this.kArgs = kArgs;
+        public OriginBuilder setFullPath(Path fullPath) {
+            this.fullPath = fullPath;
             return this;
         }
 

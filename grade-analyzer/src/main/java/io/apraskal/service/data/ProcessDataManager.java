@@ -1,34 +1,20 @@
 package io.apraskal.service.data;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import io.apraskal.model.StudentPage;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.TimeUnit;
-import java.util.List;
-import java.lang.Exception;
-import java.lang.StringBuilder;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import io.apraskal.cache.*;
-import io.apraskal.model.*;
-import io.apraskal.service.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import io.apraskal.model.Student;
+import io.apraskal.model.StudentPage;
 
 public class ProcessDataManager {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
     private static final int COL_CAP = 9;
     private volatile static ProcessDataManager instance;
 
-    private static Lock instanceCreationLock = new ReentrantLock();
+    private static final Lock instanceCreationLock = new ReentrantLock();
     
     private ProcessDataManager() {}
 
@@ -42,7 +28,7 @@ public class ProcessDataManager {
                         instanceCreationLock.unlock();
                     }
                 }
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
                 throw new RuntimeException("Exeception occurred: " + e);
             }
         }
@@ -65,7 +51,7 @@ public class ProcessDataManager {
                 student[8]
             );
             return studentObj;
-        } catch (Exception e) {
+        } catch (NumberFormatException | ParseException e) {
             throw new RuntimeException("Exeception occurred: " + e);
         }
     }

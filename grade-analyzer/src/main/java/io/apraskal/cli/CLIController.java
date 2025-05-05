@@ -1,11 +1,13 @@
 package io.apraskal.cli;
 
-import java.nio.file.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
-import java.util.*;
-import java.io.*;
-import java.util.regex.*;
-import io.apraskal.model.*;
+
+import io.apraskal.model.Origin;
 
 public class CLIController implements CLICommands {
     private final Scanner SCANNER = new Scanner(System.in);
@@ -16,6 +18,7 @@ public class CLIController implements CLICommands {
 
     }
 
+    @Override
     public Origin runProgram() {
         System.out.println("####################################################");
         System.out.println("####################################################");
@@ -47,6 +50,7 @@ public class CLIController implements CLICommands {
         return processPath(path);
     }
 
+    @Override
     public boolean validateFilePath(String pathStr) {
         try {
             Path path = Paths.get(pathStr);
@@ -87,28 +91,22 @@ public class CLIController implements CLICommands {
         }
     }
 
+    @Override
     public Origin processPath(String pathStr) {
         try {
-            Path fullPath = Paths.get(pathStr).normalize();
+            Path fullPath = Paths.get(pathStr).normalize().toAbsolutePath();
             String os = System.getProperty("os.name").toLowerCase();
-            String initArg = fullPath.getFileName().toString();
-
-            int nameCount = fullPath.getNameCount(); 
-            String[] kArgs = new String[nameCount - 1];
-            for (int i = 0; i < nameCount - 1; i++) kArgs[i] = fullPath.getName(i).toString();
             Origin origin = new Origin.OriginBuilder()
                 .setOs(os)
-                .setInitArg(initArg)
-                .setKArgs(kArgs)
+                .setFullPath(fullPath)
                 .build();
             System.out.println("Host OS: " + origin.getOs());
             System.out.println("Initial Arg (file): " + origin.getInitArg());
-            System.out.println("Path Parts (kArgs): " + String.join(", ", origin.getKArgs()));
+            System.out.println("Path: " + origin.getFullPath());
             return origin;
         } catch (Exception e) {
             System.out.println("Unexpected error: " + e.getMessage());
             return null;
         }
     }
-
 }

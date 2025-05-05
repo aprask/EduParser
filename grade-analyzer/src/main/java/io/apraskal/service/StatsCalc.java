@@ -1,16 +1,14 @@
 package io.apraskal.service;
 
-import java.lang.Exception;
 import java.util.concurrent.locks.*;
 import java.util.concurrent.TimeUnit;
-import io.apraskal.service.data.ProcessDataManager;
 import io.apraskal.model.*;
 import java.util.*;
 
 public class StatsCalc {
     private volatile static StatsCalc instance;
 
-    private static Lock instanceCreationLock = new ReentrantLock();
+    private static final Lock instanceCreationLock = new ReentrantLock();
 
     private StatsCalc() {}
 
@@ -48,7 +46,9 @@ public class StatsCalc {
 
     private static double calculateMean(Student[] students) {
         int sum = 0;
-        for (int i = 0; i < students.length; i++) sum += students[i].getGrade();
+        for (Student student : students) {
+            sum += student.getGrade();
+        }
         return sum/students.length;
     }
 
