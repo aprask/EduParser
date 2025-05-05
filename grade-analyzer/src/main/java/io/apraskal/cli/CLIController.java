@@ -10,6 +10,7 @@ import io.apraskal.model.*;
 public class CLIController implements CLICommands {
     private final Scanner SCANNER = new Scanner(System.in);
     private final String ALLOWED_EXT = ".csv";
+    private final int COL_CAP = 9;
 
     public CLIController() {
 
@@ -60,7 +61,7 @@ public class CLIController implements CLICommands {
             String headerLine = Files.lines(path).findFirst().orElse("");
             String[] columns = headerLine.split(",");
 
-            if (columns.length != 9) {
+            if (columns.length != COL_CAP) {
                 System.out.println("Invalid file structure. Expected 9 columns, found: " + columns.length);
                 System.out.println("Header: " + headerLine);
                 return false;
