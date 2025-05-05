@@ -19,7 +19,6 @@ public class ReportGenerator {
 
     private static Lock instanceCreationLock = new ReentrantLock();
 
-    // TODO -- MAKE CROSS PLATFORM
     private File regularText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationSans-Regular.ttf");
     private File boldedText = new File("src/main/java/io/apraskal/resources/fonts/liberation/LiberationMono-Bold.ttf");
 

@@ -20,7 +20,6 @@ public class ApplicationManager {
     private volatile static StatsCalc calc = StatsCalc.getInstance();
 
     private static Lock instanceCreationLock = new ReentrantLock();
-    private static Lock uploadDataLock = new ReentrantLock();
 
     public ApplicationManager() {}
 
