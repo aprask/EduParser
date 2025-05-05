@@ -1,5 +1,8 @@
 package io.apraskal.model;
 
+import java.nio.file.Paths;
+import java.nio.file.Path;
+
 public class Origin {
     private String os;
     private String initArg;
@@ -21,6 +24,10 @@ public class Origin {
 
     public String[] getKArgs() {
         return kArgs;
+    }
+
+    public Path getFullPath() {
+        return Paths.get("", kArgs).resolve(initArg);
     }
 
     public static class OriginBuilder {
