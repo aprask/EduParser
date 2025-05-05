@@ -25,9 +25,16 @@ public class CLIController implements CLICommands {
         System.out.println("Please verify your file columns:");
         System.out.println("student_id\tfirst_name\tlast_name\tgrade\texam_date\tstudy_hours\n");
         System.out.println("Please note that the exam date is in the format: yyyy-mm-dd\n");
+        String os = System.getProperty("os.name").toLowerCase();
         String path = null;
         while (true) {
             System.out.println("Type -1 to exit program");
+            System.out.println("OS DETECTED: " + os);
+            if (os.contains("win")) {
+                System.out.println("\nExample File Path based on your OS: C:\\Users\\You\\Documents\\file.csv\n");
+            } else {
+                System.out.println("\nExample File Path: /home/you/Documents/file.csv\n");
+            }
             System.out.print("Enter the absolute path to a *.csv file: ");
             path = SCANNER.nextLine().trim();
             if (path.equals("-1")) System.exit(0);
