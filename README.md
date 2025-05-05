@@ -1,0 +1,3 @@
+Make sure you have Maven installed: https://maven.apache.org/install.html. Install all required dependencies by running: mvn clean install -DskipTests. Compile the project (make sure you're in the directory with the pom.xml) using: mvn compile. To run the application, execute: mvn exec:java -Dexec.mainClass="io.apraskal.App".
+
+FOR TESTING: You can use the sample.csv file uploaded to Canvas. MAKE SURE YOU USE THE ABSOLUTE PATH. If you're on WSL, use the Linux-style path (/mnt/c/...) instead of the Windows path.
