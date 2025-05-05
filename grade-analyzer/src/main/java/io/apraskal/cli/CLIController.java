@@ -85,7 +85,7 @@ public class CLIController implements CLICommands {
             String os = System.getProperty("os.name").toLowerCase();
             String initArg = fullPath.getFileName().toString();
 
-            int nameCount = fullPath.getNameCount();
+            int nameCount = fullPath.getNameCount(); 
             String[] kArgs = new String[nameCount - 1];
             for (int i = 0; i < nameCount - 1; i++) kArgs[i] = fullPath.getName(i).toString();
             Origin origin = new Origin.OriginBuilder()
